@@ -31,7 +31,6 @@ jobs:
       - name: Copy artifacts for deployment job
         run: |
           mkdir deploy
-          cp -r . ./deploy
           cp -r ./app ./deploy
           cp ./requirements.txt ./deploy
           cp .env ./deploy   # 必要なら追加
