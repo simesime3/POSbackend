@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - tech0-gen8-step4-pos-app-98
+name: Build and deploy FastAPI app to Azure Web App - tech0-gen8-step4-pos-app-98
 
 on:
   push:
@@ -13,36 +10,41 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read  # This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
+      # Pythonのセットアップ
+      - name: Set up Python version
+        uses: actions/setup-python@v3
         with:
-          node-version: '20.x'
+          python-version: '3.9'
 
-      - name: npm install, build, and test
+      # 依存関係のインストール
+      - name: Install dependencies
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
-          
-      - name: Copy artifact for deployment job
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 必要なファイルをデプロイ用ディレクトリにコピー
+      - name: Copy artifacts for deployment job
         run: |
           mkdir deploy
-          cp -r ./.next/standalone/. ./deploy
-          cp -r ./public ./deploy
-          cp -r ./.next/static/. ./deploy/.next/static
+          cp -r . ./deploy
+          # 必要に応じて、以下のディレクトリを調整
+          cp -r ./app ./deploy
+          cp ./requirements.txt ./deploy
 
+      # デプロイ用のアーティファクトをZIPに圧縮
       - name: Zip artifact for deployment
-        run: zip release.zip ./deploy -r
+        run: zip -r release.zip ./deploy
 
+      # アーティファクトをアップロード
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: node-app
+          name: fastapi-app
           path: release.zip
 
   deploy:
@@ -56,12 +58,12 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: node-app
+          name: fastapi-app
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-      
-      - name: 'Deploy to Azure Web App'
+
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
@@ -69,3 +71,8 @@ jobs:
           slot-name: 'Production'
           package: ./deploy
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B9DB7EB34575454489C00F3265DFCA9F }}
+          
+      # Azure上でのFastAPIアプリケーションの起動 (必要な場合)
+      - name: Start FastAPI with gunicorn
+        run: |
+          gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
