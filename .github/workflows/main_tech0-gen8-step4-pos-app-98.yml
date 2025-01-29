@@ -32,9 +32,9 @@ jobs:
         run: |
           mkdir deploy
           cp -r . ./deploy
-          # 必要に応じて、以下のディレクトリを調整
           cp -r ./app ./deploy
           cp ./requirements.txt ./deploy
+          cp .env ./deploy   # 必要なら追加
 
       # デプロイ用のアーティファクトをZIPに圧縮
       - name: Zip artifact for deployment
@@ -67,12 +67,4 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'tech0-gen8-step4-pos-app-98'
-          slot-name: 'Production'
-          package: ./deploy
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B9DB7EB34575454489C00F3265DFCA9F }}
-          
-      # Azure上でのFastAPIアプリケーションの起動 (必要な場合)
-      - name: Start FastAPI with gunicorn
-        run: |
-          gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
+          app-name: 'tech0-gen8-st
