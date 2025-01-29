@@ -67,4 +67,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'tech0-gen8-st
+          app-name: 'tech0-gen8-step4-pos-app-98'
+          slot-name: 'Production'
+          package: ./deploy
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B9DB7EB34575454489C00F3265DFCA9F }}
