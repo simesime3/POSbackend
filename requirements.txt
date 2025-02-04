@@ -4,6 +4,6 @@ sqlalchemy
 mysql-connector-python
 python-dotenv
 pydantic
-os
+# os
 datetime
 typing
