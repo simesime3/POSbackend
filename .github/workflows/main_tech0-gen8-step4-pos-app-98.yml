@@ -33,7 +33,6 @@ jobs:
           mkdir deploy
           cp -r ./app ./deploy
           cp ./requirements.txt ./deploy
-          cp .env ./deploy   # 必要なら追加
 
       # デプロイ用のアーティファクトをZIPに圧縮
       - name: Zip artifact for deployment
