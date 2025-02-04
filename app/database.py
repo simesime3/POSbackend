@@ -2,7 +2,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from .config import DATABASE_URL, DATABASE_URL_async  # DB接続情報
+# from .config import DATABASE_URL, DATABASE_URL_async  # DB接続情報
+import os
+from dotenv import load_dotenv
+
+# .env ファイルをロード
+load_dotenv()
+
+# 環境変数からデータベースのURLを取得
+DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL_async = os.getenv("DATABASE_URL_async")
 
 # 非同期エンジンの作成
 engine_asyc = create_async_engine(DATABASE_URL_async, echo=True)

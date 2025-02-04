@@ -5,10 +5,24 @@ from pydantic import BaseModel
 from typing import List
 from .schemas import TransactionDetailCreate  # TransactionDetailCreateがschemas.pyにある場合
 import logging
+import os
+from dotenv import load_dotenv
+
+# ロガーを設定
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# .envファイルをロード
+load_dotenv()
+
+# 環境変数からテーブル名を取得
+PRODUCTS_TABLE_NAME = os.getenv('PRODUCTS_TABLE_NAME', 'default_products')
+TRANSACTIONS_TABLE_NAME = os.getenv('TRANSACTIONS_TABLE_NAME', 'default_transactions')
+TRANSACTION_DETAILS_TABLE_NAME = os.getenv('TRANSACTION_DETAILS_TABLE_NAME', 'default_transaction_details')
 
 # 商品マスタテーブルの定義
 class Product(Base):
-    __tablename__ = 'products'
+    __tablename__ = PRODUCTS_TABLE_NAME  # 環境変数からテーブル名を取得
     
     PRD_ID = Column(Integer, primary_key=True, autoincrement=True)
     CODE = Column(CHAR(13), unique=True, nullable=False)
@@ -19,14 +33,9 @@ class Product(Base):
     transaction_details = relationship("TransactionDetail", back_populates="product")
 
 
-# ロガーを設定
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-
 # 取引テーブルの定義
 class Transaction(Base):
-    __tablename__ = 'transactions'
+    __tablename__ = TRANSACTIONS_TABLE_NAME  # 環境変数からテーブル名を取得
 
     TRD_ID = Column(Integer, primary_key=True, autoincrement=True)
     DATETIME = Column(TIMESTAMP, default="CURRENT_TIMESTAMP")
@@ -57,9 +66,10 @@ class Transaction(Base):
             db.rollback()  # エラーが発生した場合はロールバック
             raise
 
+
 # 取引明細テーブルの定義
 class TransactionDetail(Base):
-    __tablename__ = 'transaction_details'
+    __tablename__ = TRANSACTION_DETAILS_TABLE_NAME  # 環境変数からテーブル名を取得
     
     TRD_ID = Column(Integer, ForeignKey('transactions.TRD_ID'), primary_key=True)
     DTL_ID = Column(Integer, primary_key=True, autoincrement=True)
@@ -71,6 +81,7 @@ class TransactionDetail(Base):
     # 関連するテーブルとの関係
     transaction = relationship("Transaction", back_populates="transaction_details")
     product = relationship("Product", back_populates="transaction_details")
+
 
 
 class PurchaseRequest(BaseModel):
