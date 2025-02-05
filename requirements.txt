@@ -7,3 +7,4 @@ pydantic
 # os
 datetime
 typing
+aiomysql

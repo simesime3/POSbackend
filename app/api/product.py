@@ -3,6 +3,12 @@ from sqlalchemy.orm import Session
 from app import crud, schemas
 from app.database import SessionLocal
 from sqlalchemy.ext.asyncio import AsyncSession
+import logging
+
+# ロガーを設定
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 router = APIRouter()
 
@@ -19,6 +25,9 @@ def read_product(code: str, db: Session = Depends(get_db)):
     # 商品をコードで検索（同期）
     db_product = crud.get_product_by_code(db, code)
     
+    logger.info(f"read_productが行われた: DB:{db},code:{code}")
+        
+
     # 商品が見つからない場合、404エラーを返す
     if not db_product:
         raise HTTPException(status_code=404, detail="Product not found")

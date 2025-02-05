@@ -71,9 +71,9 @@ class Transaction(Base):
 class TransactionDetail(Base):
     __tablename__ = TRANSACTION_DETAILS_TABLE_NAME  # 環境変数からテーブル名を取得
     
-    TRD_ID = Column(Integer, ForeignKey('transactions.TRD_ID'), primary_key=True)
+    TRD_ID = Column(Integer, ForeignKey(f'{TRANSACTIONS_TABLE_NAME}.TRD_ID'), primary_key=True)
     DTL_ID = Column(Integer, primary_key=True, autoincrement=True)
-    PRD_ID = Column(Integer, ForeignKey('products.PRD_ID'))
+    PRD_ID = Column(Integer, ForeignKey(f'{PRODUCTS_TABLE_NAME}.PRD_ID'))
     PRD_CODE = Column(CHAR(13))
     PRD_NAME = Column(String(50))
     PRD_PRICE = Column(Integer)
