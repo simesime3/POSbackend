@@ -10,3 +10,4 @@ typing
 aiomysql
 urllib.parse
 urllib
+logging
