@@ -8,3 +8,5 @@ pydantic
 datetime
 typing
 aiomysql
+urllib.parse
+urllib
