@@ -32,6 +32,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+          pip install uvicorn  # uvicornのインストール
 
       # 必要なファイルをデプロイ用ディレクトリにコピー
       - name: Copy artifacts for deployment job
