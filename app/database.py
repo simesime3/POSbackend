@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 import logging
+import base64
 from urllib.parse import quote_plus
 
 # ロガーを設定
@@ -24,10 +25,12 @@ DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME")
 DB_PORT = os.getenv("DB_PORT", 3306)
 
-# 一時ファイルのパスを確認
-pem_content = os.getenv("DB_SSL_CA")
+# 環境変数から Base64 化された証明書を取得
+pem_b64 = os.getenv("DB_SSL_CA")
 
-if pem_content:
+if pem_b64:
+    # Base64 をデコードして PEM に戻す
+    pem_content = base64.b64decode(pem_b64).decode("utf-8")
     # PEM 証明書を一時ファイルに書き込む
     with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".pem") as temp_pem:
         temp_pem.write(pem_content.replace("\\n", "\n"))  # 改行コードの変換
