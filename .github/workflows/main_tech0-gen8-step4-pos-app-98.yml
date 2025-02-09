@@ -21,10 +21,16 @@ jobs:
         with:
           python-version: '3.9'
 
-      # 依存関係のインストール
+      # 仮想環境の作成とアクティベート
+      - name: Create and activate virtual environment
+        run: |
+          python -m venv antenv
+          source antenv/bin/activate
+
+      # 依存関係のインストール (仮想環境内)
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
 
       # 必要なファイルをデプロイ用ディレクトリにコピー
