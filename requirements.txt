@@ -8,5 +8,5 @@ pydantic
 datetime
 typing
 aiomysql
-logging
+# logging
 
