@@ -26,7 +26,6 @@ jobs:
         run: |
           python -m venv antenv
           source antenv/bin/activate
-          uvicorn main:app --host 0.0.0.0 --port 8000
 
       # 依存関係のインストール (仮想環境内)
       - name: Install dependencies
@@ -77,3 +76,10 @@ jobs:
           slot-name: 'Production'
           package: ./deploy
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B9DB7EB34575454489C00F3265DFCA9F }}
+
+      # Azure Web Appでのアプリケーション起動設定
+      - name: Setup Uvicorn for Azure Web App
+        run: |
+          echo 'Starting Uvicorn server on Azure Web App'
+          echo 'web: uvicorn main:app --host 0.0.0.0 --port 8000' > ./deploy/startup.sh
+          chmod +x ./deploy/startup.sh
