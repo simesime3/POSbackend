@@ -1,11 +1,3 @@
-name: Build and deploy FastAPI app to Azure Web App - tech0-gen8-step4-pos-app-98
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,13 +18,8 @@ jobs:
         run: |
           python -m venv antenv
           source antenv/bin/activate
-
-      # 依存関係のインストール (仮想環境内)
-      - name: Install dependencies
-        run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          pip install uvicorn  # uvicornのインストール
 
       # 必要なファイルをデプロイ用ディレクトリにコピー
       - name: Copy artifacts for deployment job
@@ -40,6 +27,16 @@ jobs:
           mkdir deploy
           cp -r ./app ./deploy
           cp ./requirements.txt ./deploy
+
+      # startup.sh スクリプトを作成
+      - name: Create startup.sh script
+        run: |
+          echo '#!/bin/bash' > ./deploy/startup.sh
+          echo 'source /home/site/wwwroot/antenv/bin/activate' >> ./deploy/startup.sh
+          echo 'pip install --upgrade pip' >> ./deploy/startup.sh
+          echo 'pip install -r /home/site/wwwroot/requirements.txt' >> ./deploy/startup.sh
+          echo 'uvicorn main:app --host 0.0.0.0 --port 8000' >> ./deploy/startup.sh
+          chmod +x ./deploy/startup.sh
 
       # デプロイ用のアーティファクトをZIPに圧縮
       - name: Zip artifact for deployment
@@ -76,10 +73,3 @@ jobs:
           slot-name: 'Production'
           package: ./deploy
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B9DB7EB34575454489C00F3265DFCA9F }}
-
-      # Azure Web Appでのアプリケーション起動設定
-      - name: Setup Uvicorn for Azure Web App
-        run: |
-          echo 'Starting Uvicorn server on Azure Web App'
-          echo 'web: uvicorn main:app --host 0.0.0.0 --port 8000' > ./deploy/startup.sh
-          chmod +x ./deploy/startup.sh
