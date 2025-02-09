@@ -128,6 +128,9 @@ async def update_transaction_total(db: AsyncSession, trd_id: int):
         transaction.TOTAL_AMT = total_amount
         await db.commit()
         await db.refresh(transaction)
+
+        # 更新した合計金額を返す
+        return total_amount
     except Exception as e:
         await db.rollback()
         logger.error(f"TOTAL_AMTの更新に失敗しました: {e}")

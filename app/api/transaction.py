@@ -20,7 +20,6 @@ router = APIRouter()
 async def purchase_transaction(request: Request, db: AsyncSession = Depends(database.get_db_async)):
     request_body = await request.json()
     logger.info(f"受け取った request: {request_body}")
-    logger.info(f"db のタイプ: {type(db)}")
 
     try:
         cart = request_body.get("cart", [])
@@ -30,21 +29,27 @@ async def purchase_transaction(request: Request, db: AsyncSession = Depends(data
 
         # 1. Transaction を TOTAL_AMT=0 で作成し、コミット
         transaction = await crud.create_transaction(db)
-        logger.info(f"Transaction のタイプ: {type(transaction)}")
 
         # 2. TRD_ID を取得し、TransactionDetail を登録
         transaction_id = transaction.TRD_ID
         await crud.add_transaction_details(db, transaction_id, cart)
 
         # 3. 合計金額を計算し、Transaction を更新
-        await crud.update_transaction_total(db, transaction_id)
+        total_amount = await crud.update_transaction_total(db, transaction_id)
 
-        logger.info(f"取引が完了しました。ID: {transaction_id}")
-        return {"message": "購入処理が成功しました", "transaction_id": transaction_id}
+        logger.info(f"取引が完了しました。ID: {transaction_id}, 合計金額: {total_amount}")
+        return {
+            "message": "購入処理が成功しました",
+            "transaction_id": transaction_id,
+            "total_amount": total_amount  # フロントエンドに合計金額を返す
+        }
 
     except Exception as e:
         logger.error(f"購入処理中にエラーが発生しました: {e}")
         return {"error": "購入処理に失敗しました", "details": str(e)}
+
+    
+    
 
 # # app/transaction.py
 
