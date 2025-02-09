@@ -30,6 +30,7 @@ async def purchase_transaction(request: Request, db: AsyncSession = Depends(data
 
         # 1. Transaction を TOTAL_AMT=0 で作成し、コミット
         transaction = await crud.create_transaction(db)
+        logger.info(f"Transaction のタイプ: {type(transaction)}")
 
         # 2. TRD_ID を取得し、TransactionDetail を登録
         transaction_id = transaction.TRD_ID

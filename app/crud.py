@@ -54,22 +54,38 @@ def create_transaction_details(db: Session, trd_id: int, cart: list[schemas.Tran
 
 async def create_transaction(db: AsyncSession) -> models.Transaction:
     """TransactionをTOTAL_AMT=0で作成し、コミット"""
-    transaction = models.Transaction(
-        DATETIME=datetime.utcnow(),
-        EMP_CD="9999999999",
-        STORE_CD="30",
-        POS_NO="90",
-        TOTAL_AMT=0,
-    )
     try:
+        transaction = models.Transaction(
+            DATETIME=datetime.utcnow(),
+            EMP_CD="9999999999",
+            STORE_CD="30",
+            POS_NO="90",
+            TOTAL_AMT=0,
+        )
+        logger.info(f"作成直後の transaction の型: {type(transaction)}")  # 追加
+
         db.add(transaction)
         await db.commit()
+        logger.info("✅ トランザクションのコミット完了")
+
+        # ここでエラーが発生していないか確認
         await db.refresh(transaction)
+        logger.info("✅ トランザクションの refresh 完了")
+
+
+        logger.info(f"refresh 後の transaction の型: {type(transaction)}")  # 追加
+
+        if not isinstance(transaction, models.Transaction):
+            raise TypeError(f"作成された transaction が正しい型ではありません: {type(transaction)}")
+    
         return transaction
+
     except Exception as e:
         await db.rollback()
         logger.error(f"Transactionの作成に失敗しました: {e}")
         raise HTTPException(status_code=500, detail=f"Transaction作成に失敗しました: {str(e)}")
+
+
 
 async def add_transaction_details(db: AsyncSession, transaction_id: int, cart: list):
     for item in cart:

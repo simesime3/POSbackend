@@ -28,3 +28,12 @@ app.add_middleware(
 app.include_router(product.router, prefix="/api", tags=["products"])
 app.include_router(transaction.router, prefix="/api", tags=["transactions"])
 app.include_router(transaction_detail.router, prefix="/api", tags=["transaction_details"])  
+
+# import asyncio
+# import uvicorn
+
+# # uvloop を無効化
+# asyncio.set_event_loop_policy(None)
+
+# if __name__ == "__main__":
+#     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
