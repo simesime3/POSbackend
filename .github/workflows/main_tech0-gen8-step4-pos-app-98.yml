@@ -1,3 +1,11 @@
+name: Build and deploy FastAPI app to Azure Web App - tech0-gen8-step4-pos-app-98
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
