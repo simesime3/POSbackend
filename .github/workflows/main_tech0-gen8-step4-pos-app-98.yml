@@ -24,7 +24,7 @@ jobs:
       # 仮想環境の作成とアクティベート
       - name: Create and activate virtual environment
         run: |
-          python -m venv antenv
+          python3 -m venv antenv
           source antenv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
@@ -40,6 +40,9 @@ jobs:
       - name: Create startup.sh script
         run: |
           echo '#!/bin/bash' > ./deploy/startup.sh
+          echo 'if [ ! -d "/home/site/wwwroot/antenv" ]; then' >> ./deploy/startup.sh
+          echo '  python3 -m venv /home/site/wwwroot/antenv' >> ./deploy/startup.sh
+          echo 'fi' >> ./deploy/startup.sh
           echo 'source /home/site/wwwroot/antenv/bin/activate' >> ./deploy/startup.sh
           echo 'pip install --upgrade pip' >> ./deploy/startup.sh
           echo 'pip install -r /home/site/wwwroot/requirements.txt' >> ./deploy/startup.sh
